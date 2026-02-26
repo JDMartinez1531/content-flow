@@ -258,7 +258,7 @@ jobs:
 
 ## License
 
-MIT
+All rights reserved. © 2026 Joshua Martinez
 
 ## Credits
 
