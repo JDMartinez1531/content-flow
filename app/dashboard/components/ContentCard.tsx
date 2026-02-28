@@ -80,11 +80,14 @@ export function ContentCard({ item }: { item: ContentItem }) {
         )}
 
         {/* Action buttons */}
-        {item.fbStatus === "pending" && item.igStatus === "pending" && (
-          <button className="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 rounded transition-colors">
-            Edit & Approve
-          </button>
-        )}
+        <a
+          href={`/dashboard/content/${item.id}`}
+          className="block w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 rounded transition-colors text-center"
+        >
+          {item.fbStatus === "pending" || item.igStatus === "pending"
+            ? "Edit & Approve"
+            : "View Details"}
+        </a>
       </div>
     </div>
   );
