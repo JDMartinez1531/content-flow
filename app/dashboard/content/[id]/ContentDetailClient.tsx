@@ -25,6 +25,12 @@ export function ContentDetailClient({ item }: ContentDetailClientProps) {
   );
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  
+  // Scheduling state
+  const [fbScheduleDate, setFbScheduleDate] = useState(item.scheduledForFb || "");
+  const [igScheduleDate, setIgScheduleDate] = useState(item.scheduledForIg || "");
+  const [isScheduling, setIsScheduling] = useState(false);
+  const [scheduleMessage, setScheduleMessage] = useState<string | null>(null);
 
   const handleSaveCaption = async () => {
     if (!selectedCaptionId) {
@@ -58,6 +64,53 @@ export function ContentDetailClient({ item }: ContentDetailClientProps) {
       setSaveMessage("Failed to save. Please try again.");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleSaveSchedule = async () => {
+    if (!fbScheduleDate && !igScheduleDate) {
+      setScheduleMessage("Please set at least one schedule date");
+      return;
+    }
+
+    setIsScheduling(true);
+    setScheduleMessage(null);
+
+    try {
+      const updates: any = {};
+      
+      if (fbScheduleDate) {
+        updates.scheduledForFb = fbScheduleDate;
+        updates.fbStatus = "scheduled";
+      }
+      
+      if (igScheduleDate) {
+        updates.scheduledForIg = igScheduleDate;
+        updates.igStatus = "scheduled";
+      }
+
+      const response = await fetch(`/api/content/${item.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save schedule");
+      }
+
+      setScheduleMessage("✓ Schedule saved!");
+      
+      // Refresh the page data
+      router.refresh();
+
+      // Clear success message after 2 seconds
+      setTimeout(() => setScheduleMessage(null), 2000);
+    } catch (error) {
+      console.error("Schedule error:", error);
+      setScheduleMessage("Failed to save schedule. Please try again.");
+    } finally {
+      setIsScheduling(false);
     }
   };
 
@@ -216,21 +269,76 @@ export function ContentDetailClient({ item }: ContentDetailClientProps) {
             </div>
           )}
 
-          {/* Scheduling UI placeholder */}
+          {/* Scheduling UI */}
           <div className="mt-4 bg-white border border-slate-200 rounded-lg p-6">
-            <h3 className="font-medium text-slate-900 mb-2">
+            <h3 className="font-medium text-slate-900 mb-4">
               Schedule Posts
             </h3>
-            <p className="text-sm text-slate-600 mb-4">
-              Scheduling UI coming soon. You'll be able to set different
-              publish times for Facebook and Instagram.
-            </p>
+            
+            {/* Facebook Schedule */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Facebook
+              </label>
+              <input
+                type="datetime-local"
+                value={fbScheduleDate}
+                onChange={(e) => setFbScheduleDate(e.target.value)}
+                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                min={new Date().toISOString().slice(0, 16)}
+              />
+              {item.scheduledForFb && (
+                <p className="text-xs text-slate-500 mt-1">
+                  Currently scheduled: {new Date(item.scheduledForFb).toLocaleString()}
+                </p>
+              )}
+            </div>
+
+            {/* Instagram Schedule */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Instagram
+              </label>
+              <input
+                type="datetime-local"
+                value={igScheduleDate}
+                onChange={(e) => setIgScheduleDate(e.target.value)}
+                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                min={new Date().toISOString().slice(0, 16)}
+              />
+              {item.scheduledForIg && (
+                <p className="text-xs text-slate-500 mt-1">
+                  Currently scheduled: {new Date(item.scheduledForIg).toLocaleString()}
+                </p>
+              )}
+            </div>
+
+            {/* Save Schedule Button */}
             <button
-              disabled
-              className="w-full bg-slate-200 text-slate-500 font-medium py-2 px-4 rounded-md cursor-not-allowed"
+              onClick={handleSaveSchedule}
+              disabled={isScheduling || (!fbScheduleDate && !igScheduleDate)}
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-md transition-colors"
             >
-              Schedule (Coming Soon)
+              {isScheduling ? "Saving..." : "Save Schedule"}
             </button>
+
+            {/* Schedule status message */}
+            {scheduleMessage && (
+              <p
+                className={`mt-3 text-sm text-center ${
+                  scheduleMessage.startsWith("✓")
+                    ? "text-green-600"
+                    : "text-red-600"
+                }`}
+              >
+                {scheduleMessage}
+              </p>
+            )}
+
+            {/* Helper text */}
+            <p className="mt-3 text-xs text-slate-500">
+              Set different publish times for each platform, or leave one blank to skip it.
+            </p>
           </div>
         </div>
       </div>
