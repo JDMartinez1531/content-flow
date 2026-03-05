@@ -39,12 +39,12 @@ export const contentItems = sqliteTable("content_items", {
 
   // Status — separate per platform for partial publish handling
   fbStatus: text("fb_status", {
-    enum: ["pending", "published", "failed", "retry"],
+    enum: ["pending", "scheduled", "published", "failed", "retry"],
   })
     .default("pending")
     .notNull(),
   igStatus: text("ig_status", {
-    enum: ["pending", "published", "failed", "retry"],
+    enum: ["pending", "scheduled", "published", "failed", "retry"],
   })
     .default("pending")
     .notNull(),

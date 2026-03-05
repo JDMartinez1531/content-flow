@@ -20,7 +20,12 @@ export type CaptionAngle =
   | "social_proof"
   | "call_to_action";
 
-export type PublishStatus = "pending" | "published" | "failed" | "retry";
+export type PublishStatus =
+  | "pending"
+  | "scheduled"
+  | "published"
+  | "failed"
+  | "retry";
 
 export type Platform = "facebook" | "instagram";
 

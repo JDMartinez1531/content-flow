@@ -11,7 +11,7 @@ Multi-user content staging and approval platform for social media.
 - ✨ **Caption management** — 5 caption angles per image, easy selection
 - 📅 **Scheduling** — schedule posts for Facebook and Instagram separately
 - 🔗 **Dropbox integration** — auto-import from image_analyzer.py
-- 📊 **Status tracking** — per-platform publish status (pending/published/failed)
+- 📊 **Status tracking** — per-platform publish status (pending/scheduled/published/failed)
 - 🔄 **GitHub Actions cron** — automated posting on schedule
 - 🛡️ **Row-level security** — users can only access their own content
 
@@ -96,6 +96,9 @@ See `.env.example` for the complete list:
 - `TURSO_AUTH_TOKEN` — Turso authentication token
 - `DROPBOX_ACCESS_TOKEN` — For syncing images
 - `CRON_API_KEY` — For GitHub Actions cron jobs
+- `META_PAGE_ID` — Facebook Page ID (for posting + IG connection)
+- `META_PAGE_ACCESS_TOKEN` — Long-lived **Page** access token
+- `META_IG_BUSINESS_ACCOUNT_ID` — Optional override if not discoverable from the Page
 
 ## API Endpoints
 
@@ -107,6 +110,7 @@ See `.env.example` for the complete list:
 - `POST /api/sync` — Import images from image_analyzer.py
 - `GET /api/content/[id]` — Fetch content item
 - `PATCH /api/content/[id]` — Update content (schedule, status, caption)
+- `GET /api/meta/health` — Meta Graph API connectivity check (requires env vars)
 
 ### Cron (CRON_API_KEY Required)
 - `POST /api/publish-due` — Publish scheduled posts (called by GitHub Actions)
