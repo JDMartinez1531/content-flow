@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { CaptionSelector } from "../../components/CaptionSelector";
-import type { ContentItem } from "@/lib/types";
+import type { ContentItem, CaptionAngle } from "@/lib/types";
 import type { CaptionOptionRow } from "@/lib/captions";
 import { getStatusColor, getQualityColor } from "@/lib/utils";
 
@@ -115,7 +115,14 @@ export function ContentDetailClient({ item }: ContentDetailClientProps) {
     }
   };
 
-  const selectedCaption = item.captions.find((c) => c.id === selectedCaptionId);
+  const captions: CaptionOptionRow[] = (item.captions ?? []).map((c: any) => ({
+    id: c.id,
+    angle: c.angle as CaptionAngle,
+    caption: c.caption,
+    selected: Boolean(c.selected),
+  }));
+
+  const selectedCaption = captions.find((c) => c.id === selectedCaptionId);
   const hashtags = item.hashtags[0]?.tags || [];
 
   return (
@@ -209,9 +216,23 @@ export function ContentDetailClient({ item }: ContentDetailClientProps) {
           {/* Caption selector */}
           <div className="bg-white border border-slate-200 rounded-lg p-6 mb-4">
             <CaptionSelector
-              captions={item.captions}
+              captions={captions}
               selectedId={selectedCaptionId}
               onSelect={setSelectedCaptionId}
+              onSaveCaption={async (captionId, caption) => {
+                const res = await fetch(`/api/caption-options/${captionId}`, {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ caption }),
+                });
+
+                if (!res.ok) {
+                  throw new Error("Failed to save caption text");
+                }
+
+                // refresh to pick up server state
+                router.refresh();
+              }}
             />
 
             {/* Save button */}
