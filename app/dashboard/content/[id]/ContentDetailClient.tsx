@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { CaptionSelector } from "../../components/CaptionSelector";
-import type { ContentItem, CaptionOptionRow } from "@/lib/types";
+import type { ContentItem } from "@/lib/types";
+import type { CaptionOptionRow } from "@/lib/captions";
 import { getStatusColor, getQualityColor } from "@/lib/utils";
 
 interface ContentDetailClientProps {

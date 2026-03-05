@@ -13,8 +13,9 @@ import type { ExtendedSession } from "@/lib/auth";
 export default async function ContentDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const session = (await auth()) as ExtendedSession;
 
   if (!session?.user?.id) {
@@ -24,7 +25,7 @@ export default async function ContentDetailPage({
   // Fetch content item with captions and hashtags
   const item = await db.query.contentItems.findFirst({
     where: and(
-      eq(contentItems.id, params.id),
+      eq(contentItems.id, id),
       eq(contentItems.userId, session.user.id)
     ),
     with: {

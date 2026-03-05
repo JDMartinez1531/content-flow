@@ -12,8 +12,9 @@ import type { ExtendedSession } from "@/lib/auth";
  */
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const session = (await auth()) as ExtendedSession;
 
@@ -23,7 +24,7 @@ export async function GET(
 
     const item = await db.query.contentItems.findFirst({
       where: and(
-        eq(contentItems.id, params.id),
+        eq(contentItems.id, id),
         eq(contentItems.userId, session.user.id)
       ),
       with: {
@@ -50,8 +51,9 @@ export async function GET(
  */
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const session = (await auth()) as ExtendedSession;
 
@@ -62,7 +64,7 @@ export async function PATCH(
     // Verify ownership
     const item = await db.query.contentItems.findFirst({
       where: and(
-        eq(contentItems.id, params.id),
+        eq(contentItems.id, id),
         eq(contentItems.userId, session.user.id)
       ),
     });
@@ -86,7 +88,7 @@ export async function PATCH(
       await db
         .update(captionOptions)
         .set({ selected: false })
-        .where(eq(captionOptions.contentId, params.id));
+        .where(eq(captionOptions.contentId, id));
 
       // Set new selection
       await db
@@ -99,7 +101,7 @@ export async function PATCH(
     const updated = await db
       .update(contentItems)
       .set(updates)
-      .where(eq(contentItems.id, params.id));
+      .where(eq(contentItems.id, id));
 
     return apiSuccess({ success: true });
   } catch (error) {

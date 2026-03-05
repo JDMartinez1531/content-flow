@@ -1,7 +1,7 @@
 "use client";
 
-import { ANGLE_EMOJI } from "@/lib/types";
-import type { CaptionOptionRow } from "@/lib/types";
+import { ANGLE_EMOJI } from "@/lib/captions";
+import type { CaptionOptionRow } from "@/lib/captions";
 
 interface CaptionSelectorProps {
   captions: CaptionOptionRow[];
@@ -53,7 +53,7 @@ export function CaptionSelector({
             >
               <span className="mr-1.5">{emoji}</span>
               <span className={isSelected ? "font-medium" : ""}>
-                {caption.text}
+                {caption.caption}
               </span>
             </button>
           );
